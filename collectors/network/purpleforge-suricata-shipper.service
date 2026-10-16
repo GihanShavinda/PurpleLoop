@@ -1,0 +1,21 @@
+[Unit]
+Description=PurpleForge Suricata EVE native telemetry shipper
+After=network-online.target suricata.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=purpleforge-collector
+Group=purpleforge-collector
+EnvironmentFile=/etc/purpleforge/network-suricata.env
+ExecStart=/usr/bin/python3 /opt/purpleforge/network_shipper.py --kind suricata --file /var/log/suricata/eve.json --state /var/lib/purpleforge-network/suricata.json --key-file /etc/purpleforge/suricata.key --ca /etc/purpleforge/lab-ca.crt --url ${PURPLEFORGE_API_URL}
+Restart=always
+RestartSec=15
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/purpleforge-network
+
+[Install]
+WantedBy=multi-user.target

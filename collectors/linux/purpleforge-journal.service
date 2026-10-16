@@ -1,0 +1,22 @@
+[Unit]
+Description=PurpleForge Native Journald Telemetry Collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=purpleforge-collector
+Group=purpleforge-collector
+SupplementaryGroups=systemd-journal
+EnvironmentFile=/etc/purpleforge/collector.env
+ExecStart=/usr/bin/python3 /opt/purpleforge/journal_shipper.py --key-file /etc/purpleforge/collector.key
+Restart=always
+RestartSec=15
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/purpleforge-journal
+
+[Install]
+WantedBy=multi-user.target

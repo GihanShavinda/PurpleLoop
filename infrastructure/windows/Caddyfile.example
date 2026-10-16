@@ -1,0 +1,16 @@
+# Native Windows Caddy HTTPS proxy; edit certificate paths for your lab CA.
+# Certificate MUST include IP SAN 192.168.37.1, or use a trusted lab DNS name.
+https://192.168.37.1:8443 {
+    tls C:/purpleforge/certs/purpleforge-server.crt C:/purpleforge/certs/purpleforge-server.key
+    @ingest {
+        path /telemetry/ingest
+        method POST
+    }
+    handle @ingest {
+        request_body {
+            max_size 256KB
+        }
+        reverse_proxy 127.0.0.1:8000
+    }
+    respond 404
+}

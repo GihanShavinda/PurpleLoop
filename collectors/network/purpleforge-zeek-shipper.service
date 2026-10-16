@@ -1,0 +1,21 @@
+[Unit]
+Description=PurpleForge Zeek connection JSON native telemetry shipper
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=purpleforge-collector
+Group=purpleforge-collector
+EnvironmentFile=/etc/purpleforge/network-zeek.env
+ExecStart=/usr/bin/python3 /opt/purpleforge/network_shipper.py --kind zeek --file /var/log/purpleforge-zeek/conn.log --state /var/lib/purpleforge-network/zeek.json --key-file /etc/purpleforge/zeek.key --ca /etc/purpleforge/lab-ca.crt --url ${PURPLEFORGE_API_URL}
+Restart=always
+RestartSec=15
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/purpleforge-network
+
+[Install]
+WantedBy=multi-user.target
