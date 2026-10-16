@@ -301,3 +301,26 @@ class SoarAudit(Base):
     action: Mapped[str] = mapped_column(String(32), nullable=False)
     detail: Mapped[str] = mapped_column(Text, nullable=False, default='')
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+
+
+class ResponseRehearsal(Base):
+    """P12 immutable initial rehearsal output and explicit recorded rollback; no host actions."""
+    __tablename__ = 'response_rehearsals'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    proposal_id: Mapped[str] = mapped_column(ForeignKey('soar_proposals.id'), nullable=False, index=True)
+    initiated_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default='rehearsed')
+    plan_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    rolled_back_by: Mapped[str | None] = mapped_column(ForeignKey('users.id'))
+    rolled_back_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    rollback_note: Mapped[str] = mapped_column(Text, nullable=False, default='')
+
+class ResponseRehearsalAudit(Base):
+    __tablename__ = 'response_rehearsal_audit'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    rehearsal_id: Mapped[str] = mapped_column(ForeignKey('response_rehearsals.id'), nullable=False, index=True)
+    actor_id: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    action: Mapped[str] = mapped_column(String(32), nullable=False)
+    note: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)

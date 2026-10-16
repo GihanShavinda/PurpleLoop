@@ -14,9 +14,10 @@ import { P8IntelligenceComponent } from "./p8-intelligence.component";
 import { P9CorrelationComponent } from "./p9-correlation.component";
 import { P10AnalystComponent } from "./p10-analyst.component";
 import { P11SoarComponent } from "./p11-soar.component";
+import { P12ResponseComponent } from "./p12-response.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst" | "soar";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst" | "soar" | "response";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -248,6 +249,7 @@ const assetTypes = [
             <button [class.active]="page() === 'correlation'" (click)="go('correlation')"><span>⌘</span> Correlation</button>
             <button [class.active]="page() === 'analyst'" (click)="go('analyst')"><span>◉</span> AI Analyst</button>
             <button [class.active]="page() === 'soar'" (click)="go('soar')"><span>◇</span> SOAR</button>
+            <button [class.active]="page() === 'response'" (click)="go('response')"><span>↺</span> Response Lab</button>
           </nav>
 
           <div class="sidebar-footer">
@@ -648,6 +650,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='response'){
+        <app-p12-response [token]="token()" [canApprove]="canManage()" />
+      }
       @if(page()==='soar'){
         <app-p11-soar [token]="token()" [canWrite]="canIncidentWrite()" [canApprove]="canManage()" />
       }
@@ -1185,6 +1190,7 @@ class App {
         correlation: "Correlation Analysis",
         analyst: "SOC Analyst Workspace",
         soar: "SOAR Approval Center",
+        response: "Response Rehearsal",
       })[this.page()],
   );
   filteredAssets() {
