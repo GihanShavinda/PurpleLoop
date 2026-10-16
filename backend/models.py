@@ -354,3 +354,30 @@ class DetectionCoverageAssessment(Base):
     assessed_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
     assessed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
     __table_args__ = (UniqueConstraint('simulation_run_id','rule_id', name='uq_p14_run_rule'),)
+
+
+class AnomalyAnalysisRun(Base):
+    """P15 isolated, manually triggered model execution; no stored executable artifacts."""
+    __tablename__ = 'anomaly_analysis_runs'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False, index=True)
+    initiated_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    window_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    bucket_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    event_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    bucket_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    anomaly_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    parameters_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default='completed')
+
+class AnomalyObservation(Base):
+    __tablename__ = 'anomaly_observations'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    run_id: Mapped[str] = mapped_column(ForeignKey('anomaly_analysis_runs.id', ondelete='CASCADE'), nullable=False, index=True)
+    bucket_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    anomaly_score: Mapped[float] = mapped_column(nullable=False)
+    event_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    explanation_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    __table_args__ = (UniqueConstraint('run_id','bucket_start',name='uq_p15_run_bucket'),)
