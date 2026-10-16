@@ -381,3 +381,19 @@ class AnomalyObservation(Base):
     event_count: Mapped[int] = mapped_column(Integer, nullable=False)
     explanation_json: Mapped[dict] = mapped_column(JSON, nullable=False)
     __table_args__ = (UniqueConstraint('run_id','bucket_start',name='uq_p15_run_bucket'),)
+
+
+class InvestigationDraft(Base):
+    """P16 immutable bounded evidence snapshot and human review."""
+    __tablename__ = 'investigation_drafts'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False)
+    anomaly_run_id: Mapped[str] = mapped_column(ForeignKey('anomaly_analysis_runs.id'), nullable=False, index=True)
+    correlation_id: Mapped[str | None] = mapped_column(ForeignKey('correlation_cases.id'))
+    created_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    report_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default='draft')
+    review_note: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    reviewed_by: Mapped[str | None] = mapped_column(ForeignKey('users.id'))
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
