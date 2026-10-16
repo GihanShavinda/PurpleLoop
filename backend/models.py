@@ -162,3 +162,32 @@ class ValidationEvidence(Base):
     finding_id: Mapped[str] = mapped_column(ForeignKey('detection_findings.id'), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     __table_args__ = (UniqueConstraint('run_id','finding_id',name='uq_pf_validation_evidence'),)
+
+
+class IncidentCase(Base):
+    __tablename__ = 'incident_cases'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    title: Mapped[str] = mapped_column(String(180), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False, index=True)
+    severity: Mapped[str] = mapped_column(String(20), nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default='open')
+    assignee_id: Mapped[str | None] = mapped_column(ForeignKey('users.id'), nullable=True)
+    created_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now, nullable=False)
+
+class IncidentFinding(Base):
+    __tablename__ = 'incident_findings'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    case_id: Mapped[str] = mapped_column(ForeignKey('incident_cases.id', ondelete='CASCADE'), nullable=False, index=True)
+    finding_id: Mapped[str] = mapped_column(ForeignKey('detection_findings.id'), nullable=False, unique=True)
+    linked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+
+class IncidentNote(Base):
+    __tablename__ = 'incident_notes'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    case_id: Mapped[str] = mapped_column(ForeignKey('incident_cases.id', ondelete='CASCADE'), nullable=False, index=True)
+    actor_id: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    note: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)

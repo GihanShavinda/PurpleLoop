@@ -8,9 +8,10 @@ import {
 } from "@angular/common/http";
 import { FormsModule } from "@angular/forms";
 import { P5ValidationComponent } from "./p5-validation.component";
+import { P6IncidentsComponent } from "./p6-incidents.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -114,7 +115,7 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule, P5ValidationComponent],
+  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent],
   template: `
     @if (!token()) {
       <div class="auth-layout">
@@ -193,9 +194,9 @@ const assetTypes = [
             >
               <span>◎</span> Validation
             </button>
+            <button [class.active]="page() === 'incidents'" (click)="go('incidents')"><span>⚑</span> Incidents</button>
           </nav>
-          <div class="nav-section extra">PLANNED MODULES</div>
-          <div class="nav-muted">⚑ &nbsp; Incidents <span>Future</span></div>
+
           <div class="sidebar-footer">
             <span class="status-dot"></span> Local platform
             <span class="pill tiny">P5</span>
@@ -594,6 +595,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='incidents'){
+        <app-p6-incidents [token]="token()" [assets]="validationAssets()" [canWrite]="canIncidentWrite()" />
+      }
       @if(page()==='validation'){
         <app-p5-validation [token]="token()" [assets]="validationAssets()" [canWrite]="canEdit()" />
       }
@@ -1107,6 +1111,7 @@ class App {
         telemetry: "Telemetry Center",
         detections: "Detection Engineering",
         validation: "Detection Validation",
+        incidents: "Incident Triage",
       })[this.page()],
   );
   filteredAssets() {
@@ -1150,6 +1155,7 @@ class App {
       "Detection Engineer",
     ].includes(this.user()?.role_name || "");
   }
+  canIncidentWrite() { return ["Administrator", "Purple Team Engineer", "SOC Analyst", "Detection Engineer"].includes(this.user()?.role_name || ""); }
   countInLab(id: string) {
     return this.assets().filter((a) => a.lab_id === id).length;
   }
