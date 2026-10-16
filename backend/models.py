@@ -339,3 +339,18 @@ class LabSimulationRun(Base):
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     evidence_event_id: Mapped[str | None] = mapped_column(ForeignKey('telemetry_events.id'))
     note: Mapped[str] = mapped_column(Text, nullable=False, default='')
+
+
+class DetectionCoverageAssessment(Base):
+    """A manual, immutable assessment of one verified P13 run vs one P4 rule."""
+    __tablename__ = 'detection_coverage_assessments'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    simulation_run_id: Mapped[str] = mapped_column(ForeignKey('lab_simulation_runs.id'), nullable=False, index=True)
+    rule_id: Mapped[str] = mapped_column(ForeignKey('detection_rules.id'), nullable=False)
+    event_id: Mapped[str] = mapped_column(ForeignKey('telemetry_events.id'), nullable=False)
+    finding_id: Mapped[str | None] = mapped_column(ForeignKey('detection_findings.id'))
+    outcome: Mapped[str] = mapped_column(String(24), nullable=False)
+    explanation: Mapped[str] = mapped_column(Text, nullable=False)
+    assessed_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    assessed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    __table_args__ = (UniqueConstraint('simulation_run_id','rule_id', name='uq_p14_run_rule'),)
