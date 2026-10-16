@@ -121,7 +121,7 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent, P11SoarComponent],
+  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent, P11SoarComponent, P12ResponseComponent],
   styles: [`
     :host .shell > aside.sidebar {
       position: sticky;
