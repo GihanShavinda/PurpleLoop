@@ -25,10 +25,11 @@ from .vmware_range.routes import router as vmware_range_router
 from .operations.routes import router as operations_router
 from .assurance.routes import router as assurance_router
 from .assurance.headers import apply_security_headers
+from .release.routes import router as release_router
 
 s=get_settings()
 logging.basicConfig(level=getattr(logging,s.log_level.upper(),logging.INFO))
-app=FastAPI(title='PurpleForge AI',version='0.19.0',description='P3 native telemetry collection for VMware lab. No attack execution.')
+app=FastAPI(title='PurpleForge AI',version='0.20.0',description='P3 native telemetry collection for VMware lab. No attack execution.')
 app.add_middleware(CORSMiddleware,allow_origins=s.allowed_origins,allow_credentials=True,allow_methods=['GET','POST','PATCH','DELETE','OPTIONS'],allow_headers=['Authorization','Content-Type','X-Collector-Key'])
 app.include_router(auth_router)
 app.include_router(platform_router)
@@ -49,6 +50,7 @@ app.include_router(investigation_router)
 app.include_router(vmware_range_router)
 app.include_router(operations_router)
 app.include_router(assurance_router)
+app.include_router(release_router)
 
 @app.middleware("http")
 async def security_headers_middleware(request, call_next):
@@ -58,7 +60,7 @@ async def security_headers_middleware(request, call_next):
 
 @app.get('/health', tags=['system'])
 def health():
-    return {'status':'ok','version':'P19'}
+    return {'status':'ok','version':'P20'}
 
 @app.get('/health/services',tags=['system'])
 def services(user=Depends(require_roles('Administrator'))):

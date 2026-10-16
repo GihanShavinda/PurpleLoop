@@ -22,9 +22,10 @@ import { P16InvestigationComponent } from "./p16-investigation.component";
 import { P17VmwareRangeComponent } from "./p17-vmware-range.component";
 import { P18OperationsComponent } from "./p18-operations.component";
 import { P19AssuranceComponent } from "./p19-assurance.component";
+import { P20ReleaseComponent } from "./p20-release.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst" | "soar" | "response" | "simulation" | "coverage" | "anomaly" | "investigation" | "vmware-range" | "operations" | "assurance";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst" | "soar" | "response" | "simulation" | "coverage" | "anomaly" | "investigation" | "vmware-range" | "operations" | "assurance" | "release";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -128,7 +129,7 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent, P11SoarComponent, P12ResponseComponent, P13SimulationComponent, P14CoverageComponent, P15AnomalyComponent, P16InvestigationComponent, P17VmwareRangeComponent, P18OperationsComponent, P19AssuranceComponent],
+  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent, P11SoarComponent, P12ResponseComponent, P13SimulationComponent, P14CoverageComponent, P15AnomalyComponent, P16InvestigationComponent, P17VmwareRangeComponent, P18OperationsComponent, P19AssuranceComponent, P20ReleaseComponent],
   styles: [`
     :host .shell > aside.sidebar {
       position: sticky;
@@ -264,6 +265,7 @@ const assetTypes = [
             <button [class.active]="page() === 'vmware-range'" (click)="go('vmware-range')"><span>▣</span> VMware Range</button>
             <button [class.active]="page() === 'operations'" (click)="go('operations')"><span>▤</span> Operations Center</button>
             <button [class.active]="page() === 'assurance'" (click)="go('assurance')"><span>◈</span> Security Assurance</button>
+            <button [class.active]="page() === 'release'" (click)="go('release')"><span>▣</span> Final Evaluation</button>
           </nav>
 
           <div class="sidebar-footer">
@@ -664,6 +666,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='release'){
+        <app-p20-release [token]="token()" />
+      }
       @if(page()==='assurance'){
         <app-p19-assurance [token]="token()" />
       }
@@ -1230,6 +1235,7 @@ class App {
         coverage: "Detection Coverage",
         operations: "Purple Team Operations",
         assurance: "Security Assurance",
+        release: "Release",
         "vmware-range": "VMware Range",
         investigation: "Investigation Assistant",
         anomaly: "Anomaly Detection",
