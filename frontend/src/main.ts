@@ -10,9 +10,10 @@ import { FormsModule } from "@angular/forms";
 import { P5ValidationComponent } from "./p5-validation.component";
 import { P6IncidentsComponent } from "./p6-incidents.component";
 import { P7HuntingComponent } from "./p7-hunting.component";
+import { P8IntelligenceComponent } from "./p8-intelligence.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -116,7 +117,7 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent],
+  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent],
   template: `
     @if (!token()) {
       <div class="auth-layout">
@@ -197,6 +198,7 @@ const assetTypes = [
             </button>
             <button [class.active]="page() === 'incidents'" (click)="go('incidents')"><span>⚑</span> Incidents</button>
             <button [class.active]="page() === 'hunting'" (click)="go('hunting')"><span>⌕</span> Threat Hunting</button>
+            <button [class.active]="page() === 'intelligence'" (click)="go('intelligence')"><span>◉</span> Threat Intelligence</button>
           </nav>
 
           <div class="sidebar-footer">
@@ -597,6 +599,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='intelligence'){
+        <app-p8-intelligence [token]="token()" [assets]="validationAssets()" [canWrite]="canIncidentWrite()" />
+      }
       @if(page()==='hunting'){
         <app-p7-hunting [token]="token()" [assets]="validationAssets()" [canWrite]="canIncidentWrite()" />
       }
@@ -1118,6 +1123,7 @@ class App {
         validation: "Detection Validation",
         incidents: "Incident Triage",
         hunting: "Threat Hunting",
+        intelligence: "Threat Intelligence",
       })[this.page()],
   );
   filteredAssets() {

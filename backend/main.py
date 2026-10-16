@@ -12,10 +12,12 @@ from .detections.routes import router as detections_router
 from .validation.routes import router as validation_router
 from .incidents.routes import router as incidents_router
 from .hunting.routes import router as hunting_router
+from .intelligence.routes import router as intelligence_router
+from .intelligence.routes import router as intelligence_router
 
 s=get_settings()
 logging.basicConfig(level=getattr(logging,s.log_level.upper(),logging.INFO))
-app=FastAPI(title='PurpleForge AI',version='0.7.0',description='P3 native telemetry collection for VMware lab. No attack execution.')
+app=FastAPI(title='PurpleForge AI',version='0.8.0',description='P3 native telemetry collection for VMware lab. No attack execution.')
 app.add_middleware(CORSMiddleware,allow_origins=s.allowed_origins,allow_credentials=True,allow_methods=['GET','POST','PATCH','DELETE','OPTIONS'],allow_headers=['Authorization','Content-Type','X-Collector-Key'])
 app.include_router(auth_router)
 app.include_router(platform_router)
@@ -24,10 +26,12 @@ app.include_router(detections_router)
 app.include_router(validation_router)
 app.include_router(incidents_router)
 app.include_router(hunting_router)
+app.include_router(intelligence_router)
+app.include_router(intelligence_router)
 
 @app.get('/health', tags=['system'])
 def health():
-    return {'status':'ok','version':'P7'}
+    return {'status':'ok','version':'P8'}
 
 @app.get('/health/services',tags=['system'])
 def services(user=Depends(require_roles('Administrator'))):

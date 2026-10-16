@@ -210,3 +210,26 @@ class HuntEvidence(Base):
     note: Mapped[str] = mapped_column(String(500), nullable=False, default='')
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
     __table_args__ = (UniqueConstraint('case_id','event_id',name='uq_p7_case_event'),)
+
+
+class IntelligenceIndicator(Base):
+    __tablename__ = 'intelligence_indicators'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    kind: Mapped[str] = mapped_column(String(20), nullable=False)
+    value: Mapped[str] = mapped_column(String(255), nullable=False)
+    source_label: Mapped[str] = mapped_column(String(160), nullable=False, default='manual')
+    confidence: Mapped[int] = mapped_column(Integer, nullable=False, default=50)
+    description: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    __table_args__ = (UniqueConstraint('kind', 'value', name='uq_p8_indicator_kind_value'),)
+
+class IntelligenceMatch(Base):
+    __tablename__ = 'intelligence_matches'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    indicator_id: Mapped[str] = mapped_column(ForeignKey('intelligence_indicators.id'), nullable=False)
+    event_id: Mapped[str] = mapped_column(ForeignKey('telemetry_events.id'), nullable=False)
+    asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    __table_args__ = (UniqueConstraint('indicator_id', 'event_id', name='uq_p8_indicator_event'),)
