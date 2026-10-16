@@ -191,3 +191,22 @@ class IncidentNote(Base):
     actor_id: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
     note: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+
+
+class SavedHunt(Base):
+    __tablename__ = 'saved_hunts'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    created_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    filters: Mapped[dict] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+
+class HuntEvidence(Base):
+    __tablename__ = 'hunt_evidence'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    case_id: Mapped[str] = mapped_column(ForeignKey('incident_cases.id', ondelete='CASCADE'), nullable=False)
+    event_id: Mapped[str] = mapped_column(ForeignKey('telemetry_events.id'), nullable=False)
+    actor_id: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    note: Mapped[str] = mapped_column(String(500), nullable=False, default='')
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    __table_args__ = (UniqueConstraint('case_id','event_id',name='uq_p7_case_event'),)
