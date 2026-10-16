@@ -13,9 +13,10 @@ import { P7HuntingComponent } from "./p7-hunting.component";
 import { P8IntelligenceComponent } from "./p8-intelligence.component";
 import { P9CorrelationComponent } from "./p9-correlation.component";
 import { P10AnalystComponent } from "./p10-analyst.component";
+import { P11SoarComponent } from "./p11-soar.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst" | "soar";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -119,7 +120,50 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent],
+  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent, P11SoarComponent],
+  styles: [`
+    :host .shell > aside.sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      height: 100dvh;
+      max-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+    :host .shell > aside.sidebar .sidebar-brand {
+      flex: 0 0 auto;
+    }
+    :host .shell > aside.sidebar .nav-section {
+      flex: 0 0 auto;
+    }
+    :host .shell > aside.sidebar nav {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: #575078 transparent;
+      padding-bottom: 12px;
+    }
+    :host .shell > aside.sidebar nav::-webkit-scrollbar { width: 6px; }
+    :host .shell > aside.sidebar nav::-webkit-scrollbar-thumb {
+      background: #575078;
+      border-radius: 6px;
+    }
+    :host .shell > aside.sidebar .sidebar-footer {
+      flex: 0 0 auto;
+    }
+    @media (max-width: 768px) {
+      :host .shell > aside.sidebar {
+        height: 100dvh;
+        max-height: 100dvh;
+      }
+    }
+  `],
   template: `
     @if (!token()) {
       <div class="auth-layout">
@@ -203,6 +247,7 @@ const assetTypes = [
             <button [class.active]="page() === 'intelligence'" (click)="go('intelligence')"><span>◉</span> Threat Intelligence</button>
             <button [class.active]="page() === 'correlation'" (click)="go('correlation')"><span>⌘</span> Correlation</button>
             <button [class.active]="page() === 'analyst'" (click)="go('analyst')"><span>◉</span> AI Analyst</button>
+            <button [class.active]="page() === 'soar'" (click)="go('soar')"><span>◇</span> SOAR</button>
           </nav>
 
           <div class="sidebar-footer">
@@ -603,6 +648,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='soar'){
+        <app-p11-soar [token]="token()" [canWrite]="canIncidentWrite()" [canApprove]="canManage()" />
+      }
       @if(page()==='analyst'){
         <app-p10-analyst [token]="token()" [assets]="validationAssets()" [canWrite]="canIncidentWrite()" />
       }
@@ -1136,6 +1184,7 @@ class App {
         intelligence: "Threat Intelligence",
         correlation: "Correlation Analysis",
         analyst: "SOC Analyst Workspace",
+        soar: "SOAR Approval Center",
       })[this.page()],
   );
   filteredAssets() {

@@ -275,3 +275,29 @@ class AnalystReport(Base):
     review_note: Mapped[str] = mapped_column(Text, nullable=False, default='')
     reviewed_by: Mapped[str | None] = mapped_column(ForeignKey('users.id'))
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class SoarProposal(Base):
+    __tablename__ = 'soar_proposals'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    playbook_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    incident_id: Mapped[str | None] = mapped_column(ForeignKey('incident_cases.id'))
+    correlation_id: Mapped[str | None] = mapped_column(ForeignKey('correlation_cases.id'))
+    justification: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default='pending')
+    proposed_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    approved_by: Mapped[str | None] = mapped_column(ForeignKey('users.id'))
+    decision_note: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    output_json: Mapped[dict | None] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    executed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+class SoarAudit(Base):
+    __tablename__ = 'soar_audit'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    proposal_id: Mapped[str] = mapped_column(ForeignKey('soar_proposals.id', ondelete='CASCADE'), nullable=False, index=True)
+    actor_id: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    action: Mapped[str] = mapped_column(String(32), nullable=False)
+    detail: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
