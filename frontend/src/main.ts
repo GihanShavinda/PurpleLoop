@@ -19,9 +19,10 @@ import { P13SimulationComponent } from "./p13-simulation.component";
 import { P14CoverageComponent } from "./p14-coverage.component";
 import { P15AnomalyComponent } from "./p15-anomaly.component";
 import { P16InvestigationComponent } from "./p16-investigation.component";
+import { P17VmwareRangeComponent } from "./p17-vmware-range.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst" | "soar" | "response" | "simulation" | "coverage" | "anomaly" | "investigation";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst" | "soar" | "response" | "simulation" | "coverage" | "anomaly" | "investigation" | "vmware-range";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -125,7 +126,7 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent, P11SoarComponent, P12ResponseComponent, P13SimulationComponent, P14CoverageComponent, P15AnomalyComponent, P16InvestigationComponent],
+  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent, P11SoarComponent, P12ResponseComponent, P13SimulationComponent, P14CoverageComponent, P15AnomalyComponent, P16InvestigationComponent, P17VmwareRangeComponent],
   styles: [`
     :host .shell > aside.sidebar {
       position: sticky;
@@ -258,6 +259,7 @@ const assetTypes = [
             <button [class.active]="page() === 'coverage'" (click)="go('coverage')"><span>◈</span> Detection Coverage</button>
             <button [class.active]="page() === 'anomaly'" (click)="go('anomaly')"><span>◉</span> Anomaly Detection</button>
             <button [class.active]="page() === 'investigation'" (click)="go('investigation')"><span>◇</span> Investigation Assistant</button>
+            <button [class.active]="page() === 'vmware-range'" (click)="go('vmware-range')"><span>▣</span> VMware Range</button>
           </nav>
 
           <div class="sidebar-footer">
@@ -658,6 +660,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='vmware-range'){
+        <app-p17-vmware-range [token]="token()" [canWrite]="canManage()" />
+      }
       @if(page()==='investigation'){
         <app-p16-investigation [token]="token()" [canWrite]="canManage()" />
       }
@@ -1214,7 +1219,8 @@ class App {
         simulation: "Lab Simulation",
         coverage: "Detection Coverage",
         anomaly: "Anomaly Detection",
-        investigation: "Investigation Workspace",
+        investigation: "Investigation",
+        "vmware-range": "VMware Range",
       })[this.page()],
   );
   filteredAssets() {

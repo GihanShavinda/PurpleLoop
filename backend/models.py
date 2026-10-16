@@ -397,3 +397,18 @@ class InvestigationDraft(Base):
     review_note: Mapped[str] = mapped_column(Text, nullable=False, default='')
     reviewed_by: Mapped[str | None] = mapped_column(ForeignKey('users.id'))
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class VmwareReadinessCheck(Base):
+    """Read-only analyst-provided VM metadata and correlated telemetry receipt."""
+    __tablename__ = 'vmware_readiness_checks'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False, index=True)
+    checked_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    checked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    vmx_path_label: Mapped[str] = mapped_column(String(400), nullable=False, default='')
+    reported_power_state: Mapped[str] = mapped_column(String(32), nullable=False)
+    reported_network: Mapped[str] = mapped_column(String(100), nullable=False, default='')
+    notes: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    observed_last_event: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    assessment_json: Mapped[dict] = mapped_column(JSON, nullable=False)
