@@ -11,9 +11,10 @@ import { P5ValidationComponent } from "./p5-validation.component";
 import { P6IncidentsComponent } from "./p6-incidents.component";
 import { P7HuntingComponent } from "./p7-hunting.component";
 import { P8IntelligenceComponent } from "./p8-intelligence.component";
+import { P9CorrelationComponent } from "./p9-correlation.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -117,7 +118,7 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent],
+  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent],
   template: `
     @if (!token()) {
       <div class="auth-layout">
@@ -199,6 +200,7 @@ const assetTypes = [
             <button [class.active]="page() === 'incidents'" (click)="go('incidents')"><span>⚑</span> Incidents</button>
             <button [class.active]="page() === 'hunting'" (click)="go('hunting')"><span>⌕</span> Threat Hunting</button>
             <button [class.active]="page() === 'intelligence'" (click)="go('intelligence')"><span>◉</span> Threat Intelligence</button>
+            <button [class.active]="page() === 'correlation'" (click)="go('correlation')"><span>⌘</span> Correlation</button>
           </nav>
 
           <div class="sidebar-footer">
@@ -599,6 +601,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='correlation'){
+        <app-p9-correlation [token]="token()" [assets]="validationAssets()" [canWrite]="canIncidentWrite()" />
+      }
       @if(page()==='intelligence'){
         <app-p8-intelligence [token]="token()" [assets]="validationAssets()" [canWrite]="canIncidentWrite()" />
       }
@@ -1124,6 +1129,7 @@ class App {
         incidents: "Incident Triage",
         hunting: "Threat Hunting",
         intelligence: "Threat Intelligence",
+        correlation: "Correlation Analysis",
       })[this.page()],
   );
   filteredAssets() {

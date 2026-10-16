@@ -233,3 +233,29 @@ class IntelligenceMatch(Base):
     asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
     __table_args__ = (UniqueConstraint('indicator_id', 'event_id', name='uq_p8_indicator_event'),)
+
+
+class CorrelationCase(Base):
+    __tablename__ = 'correlation_cases'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False, index=True)
+    window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    window_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    risk_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    risk_reasons: Mapped[dict] = mapped_column(JSON, nullable=False)
+    finding_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    indicator_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default='new')
+    created_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    __table_args__ = (UniqueConstraint('asset_id','window_start','window_end',name='uq_p9_asset_window'),)
+
+class CorrelationEvidence(Base):
+    __tablename__ = 'correlation_evidence'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    correlation_id: Mapped[str] = mapped_column(ForeignKey('correlation_cases.id',ondelete='CASCADE'), nullable=False, index=True)
+    event_id: Mapped[str] = mapped_column(ForeignKey('telemetry_events.id'), nullable=False)
+    finding_id: Mapped[str | None] = mapped_column(ForeignKey('detection_findings.id'))
+    intelligence_match_id: Mapped[str | None] = mapped_column(ForeignKey('intelligence_matches.id'))
+    evidence_kind: Mapped[str] = mapped_column(String(20), nullable=False)
+    __table_args__ = (UniqueConstraint('correlation_id','evidence_kind','event_id',name='uq_p9_case_kind_event'),)
