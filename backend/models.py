@@ -324,3 +324,18 @@ class ResponseRehearsalAudit(Base):
     action: Mapped[str] = mapped_column(String(32), nullable=False)
     note: Mapped[str] = mapped_column(Text, nullable=False, default='')
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+
+
+class LabSimulationRun(Base):
+    """Manual, opt-in lab marker verification; no remote execution."""
+    __tablename__ = 'lab_simulation_runs'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False, index=True)
+    scenario_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    marker: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default='awaiting_evidence')
+    initiated_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    evidence_event_id: Mapped[str | None] = mapped_column(ForeignKey('telemetry_events.id'))
+    note: Mapped[str] = mapped_column(Text, nullable=False, default='')

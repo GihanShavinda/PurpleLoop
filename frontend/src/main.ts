@@ -15,9 +15,10 @@ import { P9CorrelationComponent } from "./p9-correlation.component";
 import { P10AnalystComponent } from "./p10-analyst.component";
 import { P11SoarComponent } from "./p11-soar.component";
 import { P12ResponseComponent } from "./p12-response.component";
+import { P13SimulationComponent } from "./p13-simulation.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst" | "soar" | "response";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst" | "soar" | "response" | "simulation";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -121,7 +122,7 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent, P11SoarComponent, P12ResponseComponent],
+  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent, P11SoarComponent, P12ResponseComponent, P13SimulationComponent],
   styles: [`
     :host .shell > aside.sidebar {
       position: sticky;
@@ -250,6 +251,7 @@ const assetTypes = [
             <button [class.active]="page() === 'analyst'" (click)="go('analyst')"><span>◉</span> AI Analyst</button>
             <button [class.active]="page() === 'soar'" (click)="go('soar')"><span>◇</span> SOAR</button>
             <button [class.active]="page() === 'response'" (click)="go('response')"><span>↺</span> Response Lab</button>
+            <button [class.active]="page() === 'simulation'" (click)="go('simulation')"><span>◎</span> Lab Simulation</button>
           </nav>
 
           <div class="sidebar-footer">
@@ -650,6 +652,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='simulation'){
+        <app-p13-simulation [token]="token()" [assets]="validationAssets()" [canWrite]="canManage()" />
+      }
       @if(page()==='response'){
         <app-p12-response [token]="token()" [canApprove]="canManage()" />
       }
@@ -1191,6 +1196,7 @@ class App {
         analyst: "SOC Analyst Workspace",
         soar: "SOAR Approval Center",
         response: "Response Rehearsal",
+        simulation: "Lab Simulation",
       })[this.page()],
   );
   filteredAssets() {
