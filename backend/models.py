@@ -130,3 +130,35 @@ class DetectionFinding(Base):
     status: Mapped[str] = mapped_column(String(24), nullable=False, default='open')
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     __table_args__ = (UniqueConstraint('rule_id','event_id',name='uq_pf_detection_rule_event'),)
+
+
+class ValidationScenario(Base):
+    __tablename__ = 'validation_scenarios'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    name: Mapped[str] = mapped_column(String(160), unique=True, nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    rule_id: Mapped[str] = mapped_column(ForeignKey('detection_rules.id'), nullable=False)
+    asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False)
+    technique_id: Mapped[str] = mapped_column(String(24), nullable=False)
+    instructions: Mapped[str] = mapped_column(Text, nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+class ValidationRun(Base):
+    __tablename__ = 'validation_runs'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    scenario_id: Mapped[str] = mapped_column(ForeignKey('validation_scenarios.id'), nullable=False)
+    started_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default='running')
+    notes: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    evidence_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+class ValidationEvidence(Base):
+    __tablename__ = 'validation_evidence'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    run_id: Mapped[str] = mapped_column(ForeignKey('validation_runs.id'), nullable=False)
+    finding_id: Mapped[str] = mapped_column(ForeignKey('detection_findings.id'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    __table_args__ = (UniqueConstraint('run_id','finding_id',name='uq_pf_validation_evidence'),)

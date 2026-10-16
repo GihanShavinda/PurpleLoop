@@ -7,9 +7,10 @@ import {
   HttpErrorResponse,
 } from "@angular/common/http";
 import { FormsModule } from "@angular/forms";
+import { P5ValidationComponent } from "./p5-validation.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -113,7 +114,7 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, P5ValidationComponent],
   template: `
     @if (!token()) {
       <div class="auth-layout">
@@ -121,7 +122,7 @@ const assetTypes = [
           <div class="brand-mark">✦</div>
           <div class="eyebrow">PURPLE TEAM OPERATIONS</div>
           <h1>PurpleForge <span>AI</span></h1>
-          <p class="muted">VMware cyber-range operations · P4</p>
+          <p class="muted">VMware cyber-range operations · P5</p>
           <form (ngSubmit)="login()">
             <label
               >Email<input
@@ -174,19 +175,30 @@ const assetTypes = [
             >
               <span>◇</span> Network Topology
             </button>
+            <button
+              [class.active]="page() === 'telemetry'"
+              (click)="go('telemetry')"
+            >
+              <span>⌁</span> Telemetry
+            </button>
+            <button
+              [class.active]="page() === 'detections'"
+              (click)="go('detections')"
+            >
+              <span>◈</span> Detections
+            </button>
+            <button
+              [class.active]="page() === 'validation'"
+              (click)="go('validation')"
+            >
+              <span>◎</span> Validation
+            </button>
           </nav>
-          <button
-            [class.active]="page() === 'telemetry'"
-            (click)="go('telemetry')"
-          >
-            <span>⌁</span> Telemetry
-          </button>
-          <button [class.active]="page() === 'detections'" (click)="go('detections')"><span>◈</span> Detections</button>
           <div class="nav-section extra">PLANNED MODULES</div>
           <div class="nav-muted">⚑ &nbsp; Incidents <span>Future</span></div>
           <div class="sidebar-footer">
             <span class="status-dot"></span> Local platform
-            <span class="pill tiny">P4</span>
+            <span class="pill tiny">P5</span>
             <div class="muted small">VMware-first • No Docker</div>
           </div>
         </aside>
@@ -582,6 +594,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='validation'){
+        <app-p5-validation [token]="token()" [assets]="validationAssets()" [canWrite]="canEdit()" />
+      }
       @if(page()==='detections'){
         <div class="metric-grid"><div class="metric violet"><div class="metric-label">Rules</div><strong>{{detectionSummary().rules}}</strong><small>Registered</small></div><div class="metric cyan"><div class="metric-label">Enabled</div><strong>{{detectionSummary().enabled}}</strong><small>Active predicates</small></div><div class="metric orange"><div class="metric-label">Findings</div><strong>{{detectionSummary().findings}}</strong><small>Deduplicated telemetry matches</small></div></div>
         <section class="panel"><div class="panel-head"><div><h2>Rule management</h2><p>Deterministic Sigma-inspired event predicates · advisory only</p></div><button class="outline" (click)="loadDetections()">Refresh</button></div>
@@ -780,7 +795,7 @@ const assetTypes = [
               </section>
             }
             <footer>
-              PurpleForge AI · P4 Detection Engineering · P3 Native Telemetry ·
+              PurpleForge AI · P5 Detection Validation · P4 Detection Engineering ·
               Native Windows/Linux services
             </footer>
           </main>
@@ -1063,6 +1078,7 @@ class App {
         error: (e) => this.error.set(this.explain(e)),
       });
   }
+  validationAssets = computed(() => this.assets().map(a => ({ id: a.id, name: a.hostname })));
   assetLabel(id: string) {
     return this.assets().find((a) => a.id === id)?.hostname || id;
   }
@@ -1090,6 +1106,7 @@ class App {
         topology: "Network Topology",
         telemetry: "Telemetry Center",
         detections: "Detection Engineering",
+        validation: "Detection Validation",
       })[this.page()],
   );
   filteredAssets() {

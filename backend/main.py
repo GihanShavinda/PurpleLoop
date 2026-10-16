@@ -9,19 +9,21 @@ from .auth.security import require_roles
 from .integrations.services import checks
 from .telemetry.routes import router as telemetry_router
 from .detections.routes import router as detections_router
+from .validation.routes import router as validation_router
 
 s=get_settings()
 logging.basicConfig(level=getattr(logging,s.log_level.upper(),logging.INFO))
-app=FastAPI(title='PurpleForge AI',version='0.4.0',description='P3 native telemetry collection for VMware lab. No attack execution.')
+app=FastAPI(title='PurpleForge AI',version='0.5.0',description='P3 native telemetry collection for VMware lab. No attack execution.')
 app.add_middleware(CORSMiddleware,allow_origins=s.allowed_origins,allow_credentials=True,allow_methods=['GET','POST','PATCH','DELETE','OPTIONS'],allow_headers=['Authorization','Content-Type','X-Collector-Key'])
 app.include_router(auth_router)
 app.include_router(platform_router)
 app.include_router(telemetry_router)
 app.include_router(detections_router)
+app.include_router(validation_router)
 
 @app.get('/health', tags=['system'])
 def health():
-    return {'status':'ok','version':'P4'}
+    return {'status':'ok','version':'P5'}
 
 @app.get('/health/services',tags=['system'])
 def services(user=Depends(require_roles('Administrator'))):
