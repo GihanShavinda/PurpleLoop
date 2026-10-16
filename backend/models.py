@@ -259,3 +259,19 @@ class CorrelationEvidence(Base):
     intelligence_match_id: Mapped[str | None] = mapped_column(ForeignKey('intelligence_matches.id'))
     evidence_kind: Mapped[str] = mapped_column(String(20), nullable=False)
     __table_args__ = (UniqueConstraint('correlation_id','evidence_kind','event_id',name='uq_p9_case_kind_event'),)
+
+
+class AnalystReport(Base):
+    """Immutable generated snapshot with explicit human review state."""
+    __tablename__ = 'analyst_reports'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    correlation_id: Mapped[str] = mapped_column(ForeignKey('correlation_cases.id'), nullable=False, index=True)
+    asset_id: Mapped[str] = mapped_column(ForeignKey('assets.id'), nullable=False)
+    created_by: Mapped[str] = mapped_column(ForeignKey('users.id'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, nullable=False)
+    generator_version: Mapped[str] = mapped_column(String(32), nullable=False, default='evidence-v1')
+    report_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default='draft')
+    review_note: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    reviewed_by: Mapped[str | None] = mapped_column(ForeignKey('users.id'))
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

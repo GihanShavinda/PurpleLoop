@@ -12,9 +12,10 @@ import { P6IncidentsComponent } from "./p6-incidents.component";
 import { P7HuntingComponent } from "./p7-hunting.component";
 import { P8IntelligenceComponent } from "./p8-intelligence.component";
 import { P9CorrelationComponent } from "./p9-correlation.component";
+import { P10AnalystComponent } from "./p10-analyst.component";
 
 const API = "http://127.0.0.1:8000";
-type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation";
+type Page = "dashboard" | "inventory" | "labs" | "topology" | "telemetry" | "detections" | "validation" | "incidents" | "hunting" | "intelligence" | "correlation" | "analyst";
 type Criticality = "low" | "medium" | "high" | "critical";
 interface Lab {
   id: string;
@@ -118,7 +119,7 @@ const assetTypes = [
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent],
+  imports: [FormsModule, P5ValidationComponent, P6IncidentsComponent, P7HuntingComponent, P8IntelligenceComponent, P9CorrelationComponent, P10AnalystComponent],
   template: `
     @if (!token()) {
       <div class="auth-layout">
@@ -201,6 +202,7 @@ const assetTypes = [
             <button [class.active]="page() === 'hunting'" (click)="go('hunting')"><span>⌕</span> Threat Hunting</button>
             <button [class.active]="page() === 'intelligence'" (click)="go('intelligence')"><span>◉</span> Threat Intelligence</button>
             <button [class.active]="page() === 'correlation'" (click)="go('correlation')"><span>⌘</span> Correlation</button>
+            <button [class.active]="page() === 'analyst'" (click)="go('analyst')"><span>◉</span> AI Analyst</button>
           </nav>
 
           <div class="sidebar-footer">
@@ -601,6 +603,9 @@ const assetTypes = [
                 </div>
               </section>
             }
+      @if(page()==='analyst'){
+        <app-p10-analyst [token]="token()" [assets]="validationAssets()" [canWrite]="canIncidentWrite()" />
+      }
       @if(page()==='correlation'){
         <app-p9-correlation [token]="token()" [assets]="validationAssets()" [canWrite]="canIncidentWrite()" />
       }
@@ -1130,6 +1135,7 @@ class App {
         hunting: "Threat Hunting",
         intelligence: "Threat Intelligence",
         correlation: "Correlation Analysis",
+        analyst: "SOC Analyst Workspace",
       })[this.page()],
   );
   filteredAssets() {
