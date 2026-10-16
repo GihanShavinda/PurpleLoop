@@ -22,10 +22,11 @@ from .coverage.routes import router as coverage_router
 from .anomaly.routes import router as anomaly_router
 from .investigation.routes import router as investigation_router
 from .vmware_range.routes import router as vmware_range_router
+from .operations.routes import router as operations_router
 
 s=get_settings()
 logging.basicConfig(level=getattr(logging,s.log_level.upper(),logging.INFO))
-app=FastAPI(title='PurpleForge AI',version='0.17.0',description='P3 native telemetry collection for VMware lab. No attack execution.')
+app=FastAPI(title='PurpleForge AI',version='0.18.0',description='P3 native telemetry collection for VMware lab. No attack execution.')
 app.add_middleware(CORSMiddleware,allow_origins=s.allowed_origins,allow_credentials=True,allow_methods=['GET','POST','PATCH','DELETE','OPTIONS'],allow_headers=['Authorization','Content-Type','X-Collector-Key'])
 app.include_router(auth_router)
 app.include_router(platform_router)
@@ -44,10 +45,11 @@ app.include_router(coverage_router)
 app.include_router(anomaly_router)
 app.include_router(investigation_router)
 app.include_router(vmware_range_router)
+app.include_router(operations_router)
 
 @app.get('/health', tags=['system'])
 def health():
-    return {'status':'ok','version':'P17'}
+    return {'status':'ok','version':'P18'}
 
 @app.get('/health/services',tags=['system'])
 def services(user=Depends(require_roles('Administrator'))):
