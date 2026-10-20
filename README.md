@@ -1,4 +1,4 @@
-# PurpleForge AI
+# PurpleLoop
 
 **VMware-first Purple-Team Security Operations, Detection Validation & Human-Approved Response Platform**
 
@@ -49,7 +49,7 @@ The goal is to answer practical blue-team/purple-team questions:
 
 ## Problems addressed and real-world value
 
-| Operational problem | PurpleForge approach | Why it matters |
+| Operational problem | PurpleLoop approach | Why it matters |
 |---|---|---|
 | Fragmented host/network visibility | Normalized Windows, Linux, and Suricata telemetry in PostgreSQL | Gives analysts one place to inspect evidence |
 | Alerts without demonstrable effectiveness | P4 detection rules + P13 marker runs + P14 exact-event comparison | Distinguishes *telemetry observed* from *detection triggered* |
